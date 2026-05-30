@@ -1,0 +1,45 @@
+@Entity
+public class Producto {
+    @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    private Long id;
+    private String nombre;
+    private Double precio;
+    private Integer stock;
+}
+
+@Entity
+public class Carrito {
+    @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    private Long id;
+    private LocalDateTime fechaCreacion;
+
+    @OneToMany(mappedBy = "carrito", cascade = CascadeType.ALL)
+    private List<ItemCarrito> items = new ArrayList<>();
+
+    public double calcularTotal() {
+        return items.stream().mapToDouble(ItemCarrito::calcularSubtotal).sum();
+    }
+}
+
+@Entity
+public class ItemCarrito {
+    @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    private Long id;
+    private Integer cantidad;
+    private Double precioUnitario;
+
+    @ManyToOne
+    @JoinColumn(name = "carrito_id")
+    private Carrito carrito;
+
+    @ManyToOne
+    @JoinColumn(name = "producto_id")
+    private Producto producto;
+
+    public double calcularSubtotal() {
+        return cantidad * precioUnitario;
+    }
+}
